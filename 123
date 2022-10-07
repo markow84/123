@@ -1,0 +1,115 @@
+#property version   "1.00"
+
+int handleTrendMaFast; 
+int handleTrendMaSLow;
+
+int handleMaFast;
+int handleMaMiddle;
+int handleMaSLow;
+
+int OnInit()
+  {
+  
+  handleTrendMaFast = iMA(_Symbol,PERIOD_H1,8,0,MODE_EMA,PRICE_CLOSE);
+  handleTrendMaSLow = iMA(_Symbol,PERIOD_H1,21,0,MODE_EMA,PRICE_CLOSE);
+
+  handleMaFast = iMA(_Symbol,PERIOD_M5,8,0,MODE_EMA,PRICE_CLOSE);
+  handleMaMiddle = iMA(_Symbol,PERIOD_M5,13,0,MODE_EMA,PRICE_CLOSE);  
+  handleMaSLow = iMA(_Symbol,PERIOD_M5,21,0,MODE_EMA,PRICE_CLOSE);
+  
+
+   return(INIT_SUCCEEDED);
+  }
+
+void OnDeinit(const int reason)
+  {
+
+   
+  }
+
+void OnTick()
+  {
+     
+   double maTrendFast[], maTrendSlow[];
+   CopyBuffer(handleTrendMaFast,0,0,1,maTrendFast);
+   CopyBuffer(handleTrendMaSLow,0,0,1,maTrendSlow); 
+   
+   double maFast[], maMiddle[], maSlow[];
+   CopyBuffer(handleMaFast,0,0,1,maFast);
+   CopyBuffer(handleMaMiddle,0,0,1,maMiddle);
+   CopyBuffer(handleMaSLow,0,0,1,maSlow);
+         
+   double bid = SymbolInfoDouble(_Symbol,SYMBOL_BID);
+   static double lastBid = bid;
+   
+   int trendDirection = 0;
+   if(maTrendFast[0] > maTrendSlow[0] && bid > maTrendFast[0]){
+      trendDirection = 1;}
+   else if(maTrendFast[0] < maTrendSlow[0] && bid < maTrendFast[0]){
+      trendDirection = -1;}
+      
+   if(trendDirection == 1){
+      if(maFast[0] > maMiddle[0] && maMiddle[0] > maSlow[0]){
+         if(bid <= maFast[0] && lastBid > maFast[0]){
+            Print("Buy Signal");
+            }
+        }
+   }
+   
+   else if(trendDirection == -1){
+      if(maFast[0] < maMiddle[0] && maMiddle[0] < maSlow[0]){
+         if(bid >= maFast[0] && lastBid < maFast[0]){
+            Print("Sell Signal");
+            }
+        }
+   }
+   
+   lastBid = bid;
+   
+   Comment("\n",
+           "\n",
+           "\n",
+           "\n",
+           "\n",
+           "\n",
+           "\n",
+           "\n",
+           "\n",
+           "\n",
+           "\n",
+           "\n",
+           "\n",
+           "\n",
+           "\n",
+           "\n",
+           "\n",
+           "\n",
+           "\n",
+           "\n",
+           "\n",
+           "\n",
+           "\n",
+           "\n",
+           "\n",
+           "\n",
+           "\n",
+           "\n",
+           "\n",
+           "\n",
+           "\n",
+           "\n",
+           "\n",
+           "\n",
+           "\n",
+           "\n",
+           "\n",
+           "\n",
+           "\n",
+           "\n||  S Z Y B K A   E M A:                  ",DoubleToString(maTrendFast[0],_Digits),
+           "\n||  W O L N A   E M A:                   ",DoubleToString(maTrendSlow[0],_Digits),
+           "\n||  K I E R U N E K T R E N D U      ",trendDirection,
+           "\n||  F A S T   M A:                          ",DoubleToString(maFast[0],_Digits),
+           "\n||  M I D D L E  M A:                      ",DoubleToString(maMiddle[0],_Digits),
+           "\n||  S L O W   M A:                         ",DoubleToString(maSlow[0],_Digits));
+           
+   }
